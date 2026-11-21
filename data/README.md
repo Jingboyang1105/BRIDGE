@@ -2,7 +2,7 @@
 
 This GitHub repository contains source code only. It does not redistribute GTEx donor-level expression data, trained checkpoints, prediction matrices, or the completed 10.4-GB HDF5 resource.
 
-The completed GTEx Analysis V11 resource and its documentation are associated with the reserved Zenodo version DOI [`10.5281/zenodo.24421141`](https://doi.org/10.5281/zenodo.24421141). The record is not publicly available until its owners publish the current Zenodo draft.
+The completed GTEx Analysis V11 resource and its documentation are available through Zenodo at [`10.5281/zenodo.24421141`](https://doi.org/10.5281/zenodo.24421141).
 
 Access to original GTEx data remains subject to the GTEx Portal terms and any applicable data-access requirements.
 
