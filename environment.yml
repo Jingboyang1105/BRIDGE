@@ -5,6 +5,13 @@ dependencies:
   - python=3.11
   - numpy
   - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - h5py
+  - pyyaml
+  - openpyxl
   - pytest
   - pip
   - pip:

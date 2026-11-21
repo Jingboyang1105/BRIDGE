@@ -21,6 +21,15 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest"]
+analysis = [
+  "scipy",
+  "scikit-learn",
+  "matplotlib",
+  "seaborn",
+  "h5py",
+  "pyyaml",
+  "openpyxl",
+]
 
 [tool.setuptools.packages.find]
 include = ["dorian*"]

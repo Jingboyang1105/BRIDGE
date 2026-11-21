@@ -1,0 +1,18 @@
+{
+  "experiment_id": "gtex_v11_age_reassociation_seed42",
+  "split_seed": 42,
+  "mask_seed": 42,
+  "missing_rates": [0.2, 0.4, 0.6, 0.8],
+  "mask_repeats": 5,
+  "age_permutations": 100,
+  "gene_count": 20000,
+  "primary_methods": ["DORIAN", "HYFA"],
+  "reference": "Oracle coefficients from complete measured held-out target-tissue records",
+  "control_arms": ["Observed-only", "Mean-fill"],
+  "supplementary_methods": ["PMM"],
+  "age_model": "standardized_public_age_bin_midpoint_plus_sex",
+  "primary_endpoint": "oracle_age_beta_pearson",
+  "co_primary_diagnostic": "oracle_age_beta_slope",
+  "canonical_result_directory": "results/all_eligible_formal_seed42",
+  "interpretation": "coefficient recovery under simulated stratified random missingness; not independent aging-gene discovery"
+}
