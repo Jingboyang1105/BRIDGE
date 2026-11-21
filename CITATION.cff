@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use DORIAN, please cite the associated manuscript and software release."
+title: "DORIAN: Donor Residual Imputation by Aligned Neighbors"
+type: software
+authors:
+  - family-names: Yang
+    given-names: Jingbo
+  - family-names: Li
+    given-names: Ronnie
+  - family-names: Qin
+    given-names: Zhaohui
+version: 1.0.0
+date-released: 2026-11-21
+

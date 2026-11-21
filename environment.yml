@@ -1,0 +1,12 @@
+name: dorian
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - pytest
+  - pip
+  - pip:
+      - torch
+
