@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Environments and editors
+.venv/
+venv/
+.conda/
+.idea/
+.vscode/
+
+# Credentials
+.env
+.env.*
+*.pem
+*.key
+credentials*
+
+# Large research artifacts
+*.h5
+*.hdf5
+*.gct
+*.gct.gz
+*.ckpt
+*.pt
+*.pth
+*.pkl
+*.pickle
+*.npz
+*.npy
+*.zip
+*.tar
+*.tar.gz
+
+# Generated outputs
+outputs/
+results/
+checkpoints/
