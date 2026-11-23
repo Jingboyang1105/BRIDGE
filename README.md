@@ -1,6 +1,10 @@
-# DORIAN
+# BRIDGE
 
-DORIAN (**Donor Residual Imputation by Aligned Neighbors**) is a lightweight contrastive-learning framework for donor-specific and tissue-specific gene-expression imputation. It combines a donor-level average expert with a sample-matching expert through an adaptive mixer.
+**BRIDGE (Body-wide Representation via Inter-tissue Decoding Gene Expression)** is a framework for donor-specific and tissue-specific gene-expression imputation.
+
+> **Naming note:** BRIDGE was previously developed under the name DORIAN.
+> To preserve backward compatibility and reproducibility, the internal Python
+> package, module names, and some code identifiers continue to use `dorian`.
 
 This repository is the compact software and analysis-code release. It contains the core implementation, manuscript analysis scripts, a minimal API example, and focused correctness tests. Restricted GTEx inputs, trained checkpoints, large prediction artifacts, and generated analysis outputs are intentionally excluded.
 
@@ -86,3 +90,4 @@ Citation metadata are provided in [`CITATION.cff`](CITATION.cff). The associated
 ## License
 
 An open-source license has not yet been approved by all authors. Until that decision is made, the terms in [`LICENSE`](LICENSE) apply.
+
