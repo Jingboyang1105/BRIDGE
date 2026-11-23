@@ -69,7 +69,7 @@ def query_tensors(records, expr, tissue, tissue_means, start, end, max_known=64)
     return known_expr, known_tissue, known_mask, target_tissue, np.asarray(donors, dtype=object)
 
 
-def same_donor_batch(records, expr, tissue, tissue_means, indices):
+def donor_level_average_batch(records, expr, tissue, tissue_means, indices):
     result = np.empty((len(indices), expr.shape[1]), dtype=np.float32)
     for row, record_index in enumerate(indices):
         record = records[int(record_index)]
@@ -129,7 +129,7 @@ def train_mixer(records, expr, tissue, tissue_means, retrieval, n_tissues, args,
             target_indices = np.asarray([int(records[int(i)]["idx"]) for i in indices], dtype=np.int64)
             target_tissues = np.asarray([int(records[int(i)]["target_tissue"]) for i in indices], dtype=np.int64)
             known_counts = np.asarray([int(records[int(i)]["n_known_tissues"]) for i in indices], dtype=np.float32)
-            same = same_donor_batch(records, expr, tissue, tissue_means, indices)
+            same = donor_level_average_batch(records, expr, tissue, tissue_means, indices)
             memory = np.asarray(retrieval[indices], dtype=np.float32)
             experts = np.stack([same, memory], axis=1)
             true = np.asarray(expr[target_indices], dtype=np.float32)
@@ -283,7 +283,7 @@ def main():
         for start in range(0, len(queries), args.mixer_batch):
             end = min(start + args.mixer_batch, len(queries))
             indices = np.arange(start, end)
-            same = same_donor_batch(queries, expr, tissue, tissue_means, indices)
+            same = donor_level_average_batch(queries, expr, tissue, tissue_means, indices)
             memory = np.asarray(memory_out[start:end], dtype=np.float32)
             experts = np.stack([same, memory], axis=1)
             target_tissues = np.asarray([queries[i]["target_tissue"] for i in indices], dtype=np.int64)
@@ -302,7 +302,7 @@ def main():
 
     query_frame = pd.DataFrame(queries).drop(columns=["known_indices", "known_tissues"])
     query_frame.insert(0, "imputed_row", np.arange(len(query_frame)))
-    query_frame["same_donor_weight"] = weights_out[:, 0]
+    query_frame["donor_level_average_weight"] = weights_out[:, 0]
     query_frame["memory_weight"] = weights_out[:, 1]
     query_frame.to_csv(str(metadata_dir / "imputed_profile_manifest.csv"), index=False)
     np.savez_compressed(

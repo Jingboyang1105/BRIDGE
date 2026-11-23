@@ -1,9 +1,9 @@
-﻿"""DORIAN expert 1: deterministic residual transfer within the same donor."""
+"""BRIDGE donor-level average expert."""
 
 import numpy as np
 
 
-def same_donor_residual_prediction(target_tissue_mean, observed_tissue_residuals):
+def donor_level_average_residual_prediction(target_tissue_mean, observed_tissue_residuals):
     """Return the target-tissue mean plus the donor's mean observed residual.
 
     Parameters

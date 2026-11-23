@@ -16,15 +16,15 @@ INPUT = RESULTS / "hide_one_training_size_scaling_overall.csv"
 EXPECTED_HASH = "7b6e0fcfce336574b329b5455fac190666bbd3b03c9d9838e3d7550a9dd76746"
 
 METHOD_NAMES = {
-    "two_expert_cml_gate": "DORIAN",
-    "same_donor_residual": "Same-donor expert",
-    "cml_retrieval": "Memory expert",
+    "two_expert_cml_gate": "BRIDGE",
+    "donor_level_average_residual": "Donor-level average expert",
+    "cml_retrieval": "Sample-matching expert",
 }
-METHOD_ORDER = ["DORIAN", "Same-donor expert", "Memory expert"]
+METHOD_ORDER = ["BRIDGE", "Donor-level average expert", "Sample-matching expert"]
 COLORS = {
-    "DORIAN": "#167A78",
-    "Same-donor expert": "#BC7565",
-    "Memory expert": "#8172CF",
+    "BRIDGE": "#167A78",
+    "Donor-level average expert": "#BC7565",
+    "Sample-matching expert": "#8172CF",
 }
 
 mpl.rcParams.update({
@@ -112,9 +112,9 @@ def export_complete_table(data: pd.DataFrame) -> None:
     paper = paper.reset_index()
     paper = paper[[
         "Training fraction", "Training donors", "Training hide-one records",
-        "Same-donor expert MAE", "Same-donor expert Residual sample Pearson mean",
-        "Memory expert MAE", "Memory expert Residual sample Pearson mean",
-        "DORIAN MAE", "DORIAN Residual sample Pearson mean",
+        "Donor-level average expert MAE", "Donor-level average expert Residual sample Pearson mean",
+        "Sample-matching expert MAE", "Sample-matching expert Residual sample Pearson mean",
+        "BRIDGE MAE", "BRIDGE Residual sample Pearson mean",
     ]]
     paper.to_csv(RESULTS / "Table_hide_one_training_size_scaling_paper_ready.csv", index=False)
 

@@ -17,7 +17,7 @@ import pandas as pd
 
 RELEASE_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RELEASE_ROOT))
-from dorian.metrics import hyfa_pearson_scores, overall_metrics, residual_sample_pearson  # noqa: E402
+from bridge.metrics import hyfa_pearson_scores, overall_metrics, residual_sample_pearson  # noqa: E402
 
 
 def column_pearson(x: np.ndarray, y: np.ndarray) -> np.ndarray:

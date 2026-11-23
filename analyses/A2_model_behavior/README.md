@@ -1,6 +1,6 @@
 # A2 — Model behavior
 
-**Question:** What structure does DORIAN learn, which tissues are retrieved, and how does the mixer weight its experts?
+**Question:** What structure does BRIDGE learn, which tissues are retrieved, and how does the mixer weight its experts?
 
 The active scripts generate the hide-one retrieval-composition heatmap, formal hide-one statistics and mixer diagnostics. The historical embedding workflow requires the original runtime and is preserved under `baselines/`. `outputs/source_data/hide_one_retrieval_manifest.json` identifies the formal 200-epoch checkpoint and hide-one source.
 

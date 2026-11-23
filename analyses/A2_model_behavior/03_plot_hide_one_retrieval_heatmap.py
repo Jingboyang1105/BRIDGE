@@ -110,7 +110,7 @@ def main() -> int:
         "font.size": 7,
     })
     cmap = LinearSegmentedColormap.from_list(
-        "dorian_black_teal_mint",
+        "bridge_black_teal_mint",
         ["#080304", "#1c1324", "#332758", "#385f9f", "#38a6a6", "#62d0ad", "#e1f6df"],
     )
     fig, ax = plt.subplots(figsize=(13.8, 12.2))

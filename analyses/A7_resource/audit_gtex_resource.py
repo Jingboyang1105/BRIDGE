@@ -1,4 +1,4 @@
-"""Read-only GTEx v11 inventory for the DORIAN completed resource."""
+"""Read-only GTEx v11 inventory for the BRIDGE completed resource."""
 
 from __future__ import annotations
 

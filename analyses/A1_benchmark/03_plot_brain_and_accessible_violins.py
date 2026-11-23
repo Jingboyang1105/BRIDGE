@@ -21,8 +21,8 @@ plt.rcParams["axes.spines.top"] = False
 plt.rcParams["axes.spines.right"] = False
 plt.rcParams["legend.frameon"] = False
 
-METHODS = ["DORIAN", "HYFA", "PMM"]
-COLORS = {"DORIAN": "#6C5CE7", "HYFA": "#F2B84B", "PMM": "#36B8A5"}
+METHODS = ["BRIDGE", "HYFA", "PMM"]
+COLORS = {"BRIDGE": "#6C5CE7", "HYFA": "#F2B84B", "PMM": "#36B8A5"}
 METRICS = {
     "mae": {"label": "MAE", "better": "lower"},
     "residual_sample_pearson": {"label": "Residual Pearson correlation", "better": "higher"},
@@ -55,13 +55,13 @@ def _load_records(root: Path) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
 
     hide_specs = [
-        ("DORIAN", "02_Benchmark_vs_HYFA_PMM/results/hide_one/hide_one_test_200e_cml_record_scores_for_boxplots.csv"),
+        ("BRIDGE", "02_Benchmark_vs_HYFA_PMM/results/hide_one/hide_one_test_200e_cml_record_scores_for_boxplots.csv"),
         ("HYFA", "02_Benchmark_vs_HYFA_PMM/results/hide_one/hide_one_test_200e_hyfa_record_scores_for_boxplots.csv"),
         ("PMM", "02_Benchmark_vs_HYFA_PMM/results/pmm_v11_seed42/formal_olga/hide_one/pmm_record_scores.csv"),
     ]
     for method, path in hide_specs:
         df = _read(root, path)
-        if method == "DORIAN":
+        if method == "BRIDGE":
             df = df[
                 (df["method"] == "CML gate")
                 & (df["prediction_key"] == "pred_two_expert_cml_gate")
@@ -76,7 +76,7 @@ def _load_records(root: Path) -> pd.DataFrame:
         "02_Benchmark_vs_HYFA_PMM/results/accessible/accessible_20000genes_seed42_record_scores_for_boxplots.csv",
     )
     accessible["method"] = accessible["method"].replace(
-        {"CML_accessible_hide_one_gate": "DORIAN", "HYFA_accessible": "HYFA"}
+        {"CML_accessible_hide_one_gate": "BRIDGE", "HYFA_accessible": "HYFA"}
     )
     accessible["protocol"] = "accessible"
     frames.append(accessible)
@@ -139,7 +139,7 @@ def build_sources(root: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
             if set(frame["method"].dropna().astype(str)) != set(METHODS):
                 raise ValueError(f"Incomplete method coverage for {protocol}")
         order = (
-            block[block["method"] == "DORIAN"]
+            block[block["method"] == "BRIDGE"]
             .sort_values("residual_sample_pearson", ascending=False)["target_tissue"]
             .tolist()
         )

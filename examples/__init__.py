@@ -1,2 +1,2 @@
-"""Runnable examples for the DORIAN package."""
+"""Runnable examples for the BRIDGE package."""
 

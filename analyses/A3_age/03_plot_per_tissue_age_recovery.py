@@ -15,7 +15,7 @@ RESULTS = EXPERIMENT / "results" / "all_eligible_formal_seed42"
 INPUT = RESULTS / "age_recovery_endpoints.csv"
 OUT = RESULTS / "figures"
 
-COLORS = {"DORIAN": "#6C5CE7", "HYFA": "#F2B84B"}
+COLORS = {"BRIDGE": "#6C5CE7", "HYFA": "#F2B84B"}
 
 
 def shorten(name: str) -> str:
@@ -62,7 +62,7 @@ def main() -> None:
 
     frame = frame.loc[frame["arm"].isin(COLORS)].copy()
     if frame["tissue"].nunique() != 49 or set(frame["arm"]) != set(COLORS):
-        raise ValueError("Expected exactly 49 tissues and DORIAN/HYFA")
+        raise ValueError("Expected exactly 49 tissues and BRIDGE/HYFA")
     if not np.isfinite(frame["beta_pearson"]).all():
         raise ValueError("Non-finite beta Pearson values")
 
@@ -75,17 +75,17 @@ def main() -> None:
         .agg(mean="mean", sd="std", n_cells="size")
     )
     wide = summary.pivot(index=["tissue", "tissue_name"], columns="arm", values="mean").reset_index()
-    wide["dorian_minus_hyfa"] = wide["DORIAN"] - wide["HYFA"]
-    wide = wide.sort_values("DORIAN", ascending=False, kind="stable").reset_index(drop=True)
-    wins = int((wide["dorian_minus_hyfa"] > 0).sum())
+    wide["bridge_minus_hyfa"] = wide["BRIDGE"] - wide["HYFA"]
+    wide = wide.sort_values("BRIDGE", ascending=False, kind="stable").reset_index(drop=True)
+    wins = int((wide["bridge_minus_hyfa"] > 0).sum())
     if wins != 43:
-        raise ValueError(f"Expected 43 DORIAN tissue wins, got {wins}")
+        raise ValueError(f"Expected 43 BRIDGE tissue wins, got {wins}")
 
     order = wide["tissue_name"].tolist()
     rank = {name: i for i, name in enumerate(order)}
     summary["display_order"] = summary["tissue_name"].map(rank)
-    summary = summary.sort_values(["display_order", "arm"], key=lambda s: s.map({"DORIAN": 0, "HYFA": 1}) if s.name == "arm" else s)
-    source = summary.merge(wide[["tissue", "dorian_minus_hyfa"]], on="tissue", how="left")
+    summary = summary.sort_values(["display_order", "arm"], key=lambda s: s.map({"BRIDGE": 0, "HYFA": 1}) if s.name == "arm" else s)
+    source = summary.merge(wide[["tissue", "bridge_minus_hyfa"]], on="tissue", how="left")
 
     OUT.mkdir(parents=True, exist_ok=True)
     source.to_csv(OUT / "age_beta_pearson_per_tissue_source_data.csv", index=False)
@@ -96,8 +96,8 @@ def main() -> None:
                 "tissues": 49,
                 "methods": list(COLORS),
                 "cells_per_tissue_method": 20,
-                "dorian_tissue_wins": wins,
-                "sort": "DORIAN mean beta_pearson descending",
+                "bridge_tissue_wins": wins,
+                "sort": "BRIDGE mean beta_pearson descending",
                 "colors": COLORS,
                 "all_finite": True,
             },
@@ -123,7 +123,7 @@ def main() -> None:
     y = np.arange(len(wide))
     height = 0.38
     fig, ax = plt.subplots(figsize=(8.2, 12.6), constrained_layout=False)
-    ax.barh(y - height / 2, wide["DORIAN"], height, color=COLORS["DORIAN"], label="DORIAN", linewidth=0)
+    ax.barh(y - height / 2, wide["BRIDGE"], height, color=COLORS["BRIDGE"], label="BRIDGE", linewidth=0)
     ax.barh(y + height / 2, wide["HYFA"], height, color=COLORS["HYFA"], label="HYFA", linewidth=0)
     ax.set_xlim(0, 1.0)
     ax.set_ylim(-0.65, len(wide) - 0.35)

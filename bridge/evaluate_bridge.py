@@ -1,4 +1,4 @@
-﻿"""Evaluate a trained DORIAN checkpoint on an arbitrary record CSV."""
+"""Evaluate a trained BRIDGE checkpoint on an arbitrary record CSV."""
 
 import argparse
 from pathlib import Path
@@ -7,13 +7,13 @@ import numpy as np
 import pandas as pd
 import torch
 
-from dorian.benchmark_io import save_prediction_bundle, write_evaluation_tables
-from dorian.data import load_gene_set
-from dorian.memory_retrieval_expert import MemoryRetrievalEncoder, RecordDataset
-from dorian.adaptive_mixer import AdaptivePredictionMixer, predict_with_adaptive_mixer
-from dorian.records import donor_to_indices
-from dorian.donor_split import split_donors
-from dorian.training_utils import (
+from bridge.benchmark_io import save_prediction_bundle, write_evaluation_tables
+from bridge.data import load_gene_set
+from bridge.sample_matching_expert import SampleMatchingEncoder, RecordDataset
+from bridge.adaptive_mixer import AdaptivePredictionMixer, predict_with_adaptive_mixer
+from bridge.records import donor_to_indices
+from bridge.donor_split import split_donors
+from bridge.training_utils import (
     build_task_records,
     encode_target_bank,
     predict_retrieval,
@@ -92,7 +92,7 @@ def main():
     eval_frame.to_csv(out_dir / f"{cli.prefix}_test_records.csv", index=False)
 
     device = torch.device(f"cuda:{cli.gpu}" if torch.cuda.is_available() else "cpu")
-    model = MemoryRetrievalEncoder(cli.genes, int(tissue.max()) + 1, args.emb_dim).to(device)
+    model = SampleMatchingEncoder(cli.genes, int(tissue.max()) + 1, args.emb_dim).to(device)
     # Historical checkpoints store the memory encoder under the key ``cml_state``.
     model.load_state_dict(checkpoint["cml_state"])
     gate = AdaptivePredictionMixer(int(tissue.max()) + 1).to(device)
@@ -103,8 +103,8 @@ def main():
     eval_ds = RecordDataset(eval_records, expr, meta, tissue_means)
     eval_arrays = records_to_arrays(eval_records, expr, meta, tissue_means)
     _, eval_memory = predict_retrieval(model, train_z, train_expr, eval_ds, cli.batch, cli.k, device)
-    eval_experts = np.stack([eval_arrays["same_donor"], eval_memory], axis=1)
-    eval_dorian, eval_weights = predict_with_adaptive_mixer(
+    eval_experts = np.stack([eval_arrays["donor_level_average"], eval_memory], axis=1)
+    eval_bridge, eval_weights = predict_with_adaptive_mixer(
         gate,
         eval_experts,
         eval_arrays["target_tissue"],
@@ -120,20 +120,20 @@ def main():
         gene_ids=np.array([f"gene_{i}" for i in range(eval_arrays["true"].shape[1])], dtype=object),
         y_true=eval_arrays["true"],
         predictions={
-            "dorian": eval_dorian,
-            "same_donor_residual": eval_arrays["same_donor"],
-            "memory_retrieval": eval_memory,
+            "bridge": eval_bridge,
+            "donor_level_average_residual": eval_arrays["donor_level_average"],
+            "sample_matching": eval_memory,
             "target_tissue_mean": eval_arrays["base"],
         },
     )
-    pd.DataFrame(eval_weights, columns=["same_donor_weight", "memory_retrieval_weight"]).to_csv(
+    pd.DataFrame(eval_weights, columns=["donor_level_average_weight", "sample_matching_weight"]).to_csv(
         out_dir / f"{cli.prefix}_mixer_weights.csv", index=False
     )
     extra = {
         "gene_set": cli.genes,
         "seed": cli.seed,
         "task": eval_frame["task"].iloc[0] if "task" in eval_frame and len(eval_frame) else "record_evaluation",
-        "baseline": "DORIAN_checkpoint",
+        "baseline": "BRIDGE_checkpoint",
         "checkpoint": str(cli.checkpoint),
         "n_train_records": len(train_records),
         "n_test_records": len(eval_records),

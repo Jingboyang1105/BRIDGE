@@ -2,8 +2,8 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from dorian import training_utils
-from dorian.memory_retrieval_expert import contrastive_loss
+from bridge import training_utils
+from bridge.sample_matching_expert import contrastive_loss
 
 
 def test_retrieval_masks_every_memory_record_with_the_same_target():

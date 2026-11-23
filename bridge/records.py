@@ -1,9 +1,9 @@
-﻿"""Donor-target record construction under strict split boundaries."""
+"""Donor-target record construction under strict split boundaries."""
 
 import numpy as np
 import pandas as pd
 
-from dorian.donor_split import donor_id
+from bridge.donor_split import donor_id
 
 
 def donor_to_indices(meta, indices):

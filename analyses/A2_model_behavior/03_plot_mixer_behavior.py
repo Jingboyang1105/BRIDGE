@@ -124,12 +124,12 @@ def main() -> None:
     ax1.set_box_aspect(1)
     ax1.plot(
         known["query_known_count"],
-        known["mean_same_donor_weight"],
+        known["mean_donor_level_average_weight"],
         color=brown,
         marker="o",
         markersize=3.2,
         linewidth=1.6,
-        label="same-donor residual expert",
+        label="donor-level average residual expert",
     )
     ax1.plot(
         known["query_known_count"],
@@ -138,7 +138,7 @@ def main() -> None:
         marker="o",
         markersize=3.2,
         linewidth=1.6,
-        label="memory retrieval expert",
+        label="sample matching expert",
     )
     ax1.set_xlabel("number of observed tissues")
     ax1.set_ylabel("mean mixer weight")
@@ -164,7 +164,7 @@ def main() -> None:
     )
     ax2.set_yticks(y)
     ax2.set_yticklabels([short_label(x) for x in target["target_tissue_name"]], fontsize=4.8)
-    ax2.set_xlabel("mean memory retrieval weight")
+    ax2.set_xlabel("mean sample matching weight")
     ax2.set_xlim(0.28, 0.58)
     ax2.set_xticks([0.3, 0.4, 0.5])
     ax2.grid(axis="x", color=grid, linewidth=0.65)

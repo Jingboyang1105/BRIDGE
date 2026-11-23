@@ -7,8 +7,8 @@ import pandas as pd
 
 
 REQUIRED_METRIC_COLUMNS = {
-    "target_tissue", "target_tissue_name", "n_samples", "dorian_residual",
-    "hyfa_residual", "dorian_mae", "hyfa_mae",
+    "target_tissue", "target_tissue_name", "n_samples", "bridge_residual",
+    "hyfa_residual", "bridge_mae", "hyfa_mae",
 }
 
 
@@ -26,10 +26,10 @@ def select_tissues(metrics: pd.DataFrame, per_stratum: int = 2) -> pd.DataFrame:
         raise ValueError(f"missing metric columns: {sorted(missing)}")
     frame = metrics.copy()
     frame = frame.loc[frame["n_samples"].ge(25)].copy()
-    numeric = ["dorian_residual", "hyfa_residual", "dorian_mae", "hyfa_mae"]
+    numeric = ["bridge_residual", "hyfa_residual", "bridge_mae", "hyfa_mae"]
     frame = frame.dropna(subset=numeric)
-    frame["residual_gap"] = frame["dorian_residual"] - frame["hyfa_residual"]
-    frame["mae_gap"] = frame["hyfa_mae"] - frame["dorian_mae"]
+    frame["residual_gap"] = frame["bridge_residual"] - frame["hyfa_residual"]
+    frame["mae_gap"] = frame["hyfa_mae"] - frame["bridge_mae"]
     selected: list[pd.DataFrame] = []
     used: set[int] = set()
 

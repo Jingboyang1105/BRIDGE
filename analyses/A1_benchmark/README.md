@@ -1,6 +1,6 @@
 # A1 — Core benchmark
 
-**Question:** How accurately do DORIAN, HYFA, PMM, TEEBoT and ablations reconstruct hidden tissues in hide-one and accessible-tissue settings?
+**Question:** How accurately do BRIDGE, HYFA, PMM, TEEBoT and ablations reconstruct hidden tissues in hide-one and accessible-tissue settings?
 
 ## Outputs
 
@@ -15,6 +15,6 @@
 
 ## Level B
 
-Historical DORIAN/HYFA summaries and HYFA, PMM and TEEBoT workflows are preserved in `baselines/`. Remote tissue-identity checks are in `remote/`. Their scientific logic has not been rewritten.
+Historical BRIDGE/HYFA summaries and HYFA, PMM and TEEBoT workflows are preserved in `baselines/`. Remote tissue-identity checks are in `remote/`. Their scientific logic has not been rewritten.
 
-**Evidence state:** `frozen_result_pending_provenance`. Formal DORIAN prediction equivalence and the accessible HYFA checkpoint hash remain open in `SCIENTIFIC_GATES.md`.
+**Evidence state:** `frozen_result_pending_provenance`. Formal BRIDGE prediction equivalence and the accessible HYFA checkpoint hash remain open in `SCIENTIFIC_GATES.md`.

@@ -1,6 +1,6 @@
 # Manuscript analysis code
 
-This directory contains the compact analysis-code release associated with the DORIAN manuscript. The folders follow the scientific workflow rather than the manuscript figure numbering, which may change during revision.
+This directory contains the compact analysis-code release associated with the BRIDGE manuscript. The folders follow the scientific workflow rather than the manuscript figure numbering, which may change during revision.
 
 | Folder | Analysis |
 |---|---|

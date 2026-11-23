@@ -1,4 +1,4 @@
-name: dorian
+name: bridge
 channels:
   - conda-forge
 dependencies:

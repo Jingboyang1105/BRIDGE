@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use DORIAN, please cite the associated manuscript and software release."
-title: "DORIAN: Donor Residual Imputation by Aligned Neighbors"
+message: "If you use BRIDGE, please cite the associated manuscript and software release."
+title: "BRIDGE: Body-wide Representation via Inter-tissue Decoding Gene Expression"
 type: software
 authors:
   - family-names: Yang

@@ -13,8 +13,8 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[3]
 OUT = Path(__file__).resolve().parent
-METHODS = ["DORIAN", "HYFA", "PMM"]
-COLORS = {"DORIAN": "#6C5CE7", "HYFA": "#F2B84B", "PMM": "#38B2A3"}
+METHODS = ["BRIDGE", "HYFA", "PMM"]
+COLORS = {"BRIDGE": "#6C5CE7", "HYFA": "#F2B84B", "PMM": "#38B2A3"}
 
 plt.rcParams.update(
     {
@@ -59,7 +59,7 @@ def short_name(name: str) -> str:
 def load_records() -> pd.DataFrame:
     specs = [
         (
-            "DORIAN",
+            "BRIDGE",
             ROOT / "02_Benchmark_vs_HYFA_PMM/results/hide_one/hide_one_test_200e_cml_record_scores_for_boxplots.csv",
         ),
         (
@@ -74,7 +74,7 @@ def load_records() -> pd.DataFrame:
     frames = []
     for method, path in specs:
         df = pd.read_csv(path)
-        if method == "DORIAN":
+        if method == "BRIDGE":
             df = df[
                 (df["method"] == "CML gate")
                 & (df["prediction_key"] == "pred_two_expert_cml_gate")
@@ -100,7 +100,7 @@ def load_records() -> pd.DataFrame:
         records["residual_sample_pearson"], errors="raise"
     )
     if records.groupby("method", observed=True)["record_id"].nunique().to_dict() != {
-        "DORIAN": 3922,
+        "BRIDGE": 3922,
         "HYFA": 3922,
         "PMM": 3922,
     }:
@@ -124,7 +124,7 @@ def build_source(records: pd.DataFrame) -> pd.DataFrame:
         )
     )
     order = (
-        source[source["method"] == "DORIAN"]
+        source[source["method"] == "BRIDGE"]
         .sort_values("residual_sample_pearson", ascending=False)["target_tissue"]
         .tolist()
     )

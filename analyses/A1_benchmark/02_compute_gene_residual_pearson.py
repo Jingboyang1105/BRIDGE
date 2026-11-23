@@ -22,23 +22,23 @@ OUTPUT = BENCHMARK / "results" / "final_tables"
 
 
 HIDE_ONE_METHODS = {
-    "two_expert_cml_gate": "DORIAN",
-    "same_donor_residual": "Same-donor residual expert",
-    "cml_retrieval": "Memory retrieval expert",
+    "two_expert_cml_gate": "BRIDGE",
+    "donor_level_average_residual": "Donor-level average residual expert",
+    "cml_retrieval": "Sample matching expert",
     "hyfa_hide_one_test": "HYFA",
     "PMM_mice_m1_seed42": "PMM",
     "target_tissue_mean": "Target-tissue mean",
 }
 
 CONTROL_METHODS = {
-    "no_target_identity": "DORIAN without target-tissue identity",
-    "no_any_identity": "DORIAN without any tissue identity",
+    "no_target_identity": "BRIDGE without target-tissue identity",
+    "no_any_identity": "BRIDGE without any tissue identity",
     "demographic_two_expert_gate": "Age/sex control mixer",
     "v2_age_sex_top10": "Age/sex top-10 only",
 }
 
 ACCESSIBLE_METHODS = {
-    "DORIAN_accessible": "DORIAN",
+    "BRIDGE_accessible": "BRIDGE",
     "HYFA_accessible": "HYFA",
     "TEEBoT_accessible_age_sex": "TEEBoT (age/sex)",
     "TEEBoT_accessible_expression_only": "TEEBoT (expression-only)",
@@ -47,17 +47,17 @@ ACCESSIBLE_METHODS = {
 }
 
 METHOD_ORDER = [
-    "DORIAN",
-    "DORIAN without target-tissue identity",
-    "DORIAN without any tissue identity",
+    "BRIDGE",
+    "BRIDGE without target-tissue identity",
+    "BRIDGE without any tissue identity",
     "Age/sex control mixer",
     "Age/sex top-10 only",
     "HYFA",
     "PMM",
     "TEEBoT (age/sex)",
     "TEEBoT (expression-only)",
-    "Same-donor residual expert",
-    "Memory retrieval expert",
+    "Donor-level average residual expert",
+    "Sample matching expert",
     "Target-tissue mean",
 ]
 
@@ -147,12 +147,12 @@ def build_hide_one() -> pd.DataFrame:
     final = BENCHMARK / "results" / "final_tables"
     controls = BENCHMARK / "results" / "formal_control_per_tissue"
     pmm = BENCHMARK / "results" / "pmm_v11_seed42" / "formal_olga" / "hide_one"
-    dorian = pd.read_csv(final / "dorian_hide_one_per_tissue_metrics.csv")
+    bridge = pd.read_csv(final / "dorian_hide_one_per_tissue_metrics.csv")
     hyfa = pd.read_csv(final / "hyfa_hide_one_per_tissue_metrics.csv")
     pmm_frame = pd.read_csv(pmm / "pmm_per_tissue_metrics.csv")
 
     tissue_names = pmm_frame.set_index("target_tissue")["target_tissue_name"].to_dict()
-    dorian["target_tissue_name"] = dorian["target_tissue"].map(tissue_names)
+    bridge["target_tissue_name"] = bridge["target_tissue"].map(tissue_names)
     hyfa["target_tissue_name"] = hyfa["target_tissue"].map(tissue_names)
 
     no_target = pd.read_csv(controls / "no_target_identity_per_tissue_metrics.csv")
@@ -171,7 +171,7 @@ def build_hide_one() -> pd.DataFrame:
     ].copy()
 
     frames = [
-        _standardize(dorian, "hide_one", HIDE_ONE_METHODS, "hyfa_gene_pearson_mean"),
+        _standardize(bridge, "hide_one", HIDE_ONE_METHODS, "hyfa_gene_pearson_mean"),
         _standardize(hyfa, "hide_one", HIDE_ONE_METHODS, "hyfa_gene_pearson_mean"),
         _standardize(pmm_frame, "hide_one", HIDE_ONE_METHODS, "residual_gene_pearson_mean"),
         _standardize(no_target, "hide_one", CONTROL_METHODS, "hyfa_gene_pearson_mean"),

@@ -1,9 +1,4 @@
-﻿"""Legacy-compatible DORIAN memory retrieval encoder.
-
-The public method name is DORIAN and this component is the memory retrieval
-expert. The historical class name is retained so completed checkpoints and
-older scripts remain loadable.
-"""
+"""BRIDGE sample-matching encoder and contrastive objective."""
 
 import numpy as np
 import torch
@@ -53,8 +48,8 @@ class RecordDataset(Dataset):
         return values
 
 
-class MemoryRetrievalEncoder(nn.Module):
-    """Legacy class name for the DORIAN memory retrieval encoder."""
+class SampleMatchingEncoder(nn.Module):
+    """Encode donor evidence and candidate profiles for sample matching."""
 
     def __init__(self, n_genes, n_tissues, emb_dim=128):
         super().__init__()

@@ -1,4 +1,4 @@
-﻿"""Legacy-compatible adaptive prediction mixer for DORIAN.
+"""Legacy-compatible adaptive prediction mixer for BRIDGE.
 
 The public module name is adaptive prediction mixer. The historical class and
 function names are retained so completed scripts and checkpoints remain usable.
@@ -10,7 +10,7 @@ from torch import nn
 
 
 class AdaptivePredictionMixer(nn.Module):
-    """Legacy class name for the DORIAN adaptive prediction mixer."""
+    """Legacy class name for the BRIDGE adaptive prediction mixer."""
 
     def __init__(self, n_tissues):
         super().__init__()

@@ -1,4 +1,4 @@
-﻿"""Train a donor-conditioned DORIAN memory-retrieval model.
+"""Train the donor-conditioned BRIDGE sample-matching model.
 
 The manuscript-facing main line uses hide-one training/evaluation records.
 This module also retains historical mixed-source training modes for provenance,
@@ -14,17 +14,17 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from dorian.data import load_gene_set
-from dorian.metrics import overall_metrics, per_tissue_metrics
-from dorian.memory_retrieval_expert import MemoryRetrievalEncoder, RecordDataset
-from dorian.adaptive_mixer import predict_with_adaptive_mixer, train_adaptive_mixer
-from dorian.records import (
+from bridge.data import load_gene_set
+from bridge.metrics import overall_metrics, per_tissue_metrics
+from bridge.sample_matching_expert import SampleMatchingEncoder, RecordDataset
+from bridge.adaptive_mixer import predict_with_adaptive_mixer, train_adaptive_mixer
+from bridge.records import (
     build_hide_one_records,
     build_random_feasible_known_records,
     donor_to_indices,
 )
-from dorian.donor_split import split_donors
-from dorian.training_utils import (
+from bridge.donor_split import split_donors
+from bridge.training_utils import (
     encode_target_bank,
     limit_records,
     predict_retrieval,
@@ -252,7 +252,7 @@ def run(args):
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = MemoryRetrievalEncoder(args.genes, int(tissue.max()) + 1, args.emb_dim).to(device)
+    model = SampleMatchingEncoder(args.genes, int(tissue.max()) + 1, args.emb_dim).to(device)
     val_memory_mae = train_memory_encoder(model, train_records, val_records, expr, meta, tissue_means, args, device)
     train_ds = RecordDataset(train_records, expr, meta, tissue_means)
     train_z, train_expr = encode_target_bank(model, train_ds, args.batch, device)
@@ -278,9 +278,9 @@ def run(args):
         model, train_z, train_expr, RecordDataset(test_records, expr, meta, tissue_means), args.batch, args.k, device
     )
 
-    train_experts = np.stack([train_arrays["same_donor"], train_memory], axis=1)
-    val_experts = np.stack([val_arrays["same_donor"], val_memory], axis=1)
-    test_experts = np.stack([test_arrays["same_donor"], test_memory], axis=1)
+    train_experts = np.stack([train_arrays["donor_level_average"], train_memory], axis=1)
+    val_experts = np.stack([val_arrays["donor_level_average"], val_memory], axis=1)
+    test_experts = np.stack([test_arrays["donor_level_average"], test_memory], axis=1)
     gate, val_mixer_mae = train_adaptive_mixer(
         train_experts,
         train_arrays["true"],
@@ -296,7 +296,7 @@ def run(args):
         args.lr,
         device,
     )
-    test_dorian, test_weights = predict_with_adaptive_mixer(
+    test_bridge, test_weights = predict_with_adaptive_mixer(
         gate, test_experts, test_arrays["target_tissue"], test_arrays["known_counts"], args.gate_batch, device
     )
 
@@ -306,7 +306,7 @@ def run(args):
     extra = {
         "gene_set": args.genes,
         "seed": args.seed,
-        "task": "dorian_memory_retrieval",
+        "task": "bridge_sample_matching",
         "m": args.m,
         "train_source": args.train_source,
         "training_protocol": protocol_label(args.train_source),
@@ -321,9 +321,9 @@ def run(args):
         "n_train_random_m_records": sum(r["source"] == f"random_known_m{args.m}" for r in train_records),
     }
     method_preds = {
-        "dorian": test_dorian,
-        "same_donor_residual": test_arrays["same_donor"],
-        "memory_retrieval": test_memory,
+        "bridge": test_bridge,
+        "donor_level_average_residual": test_arrays["donor_level_average"],
+        "sample_matching": test_memory,
         "target_tissue_mean": test_arrays["base"],
     }
     write_metrics(out_dir, tag, test_arrays, method_preds, tissue_names, extra)
@@ -333,7 +333,7 @@ def run(args):
     records_to_frame(train_records, "train", args.genes, args.seed, args.m).to_csv(out_dir / f"{tag}_train_records.csv", index=False)
     records_to_frame(val_records, "val", args.genes, args.seed, args.m).to_csv(out_dir / f"{tag}_val_records.csv", index=False)
     records_to_frame(test_records, "test", args.genes, args.seed, args.m).to_csv(out_dir / f"{tag}_test_records.csv", index=False)
-    pd.DataFrame(test_weights, columns=["same_donor_weight", "memory_weight"]).to_csv(
+    pd.DataFrame(test_weights, columns=["donor_level_average_weight", "memory_weight"]).to_csv(
         out_dir / f"{tag}_mixer_weights.csv", index=False
     )
     record_neighbor_df, aggregate_neighbor_df = summarize_neighbor_source_composition(test_records, train_records, test_top)
@@ -342,9 +342,9 @@ def run(args):
     np.savez_compressed(
         out_dir / f"{tag}_predictions.npz",
         true=test_arrays["true"],
-        dorian=test_dorian,
-        same_donor_residual=test_arrays["same_donor"],
-        memory_retrieval=test_memory,
+        bridge=test_bridge,
+        donor_level_average_residual=test_arrays["donor_level_average"],
+        sample_matching=test_memory,
         target_tissue_mean=test_arrays["base"],
         target_tissue=test_arrays["target_tissue"],
         known_counts=test_arrays["known_counts"],

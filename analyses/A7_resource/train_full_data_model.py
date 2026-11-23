@@ -1,4 +1,4 @@
-"""Train the fixed-duration full-data DORIAN encoder for resource production.
+"""Train the fixed-duration full-data BRIDGE encoder for resource production.
 
 This is deliberately separate from benchmark training: every multi-tissue donor
 contributes measured hide-one records, no validation subset is used for model

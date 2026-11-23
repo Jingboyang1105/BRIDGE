@@ -54,11 +54,11 @@ def parse_args():
     parser.add_argument("--components", type=int, default=30)
     parser.add_argument("--min_test_records", type=int, default=25)
     parser.add_argument(
-        "--dorian_bundle",
+        "--bridge_bundle",
         default=str(ROOT / "accessible/results/cml_accessible_20k_seed42/cml_accessible_20000genes_seed42_predictions.npz"),
     )
     parser.add_argument(
-        "--dorian_records",
+        "--bridge_records",
         default=str(ROOT / "accessible/results/cml_accessible_20k_seed42/cml_accessible_20000genes_seed42_test_records.csv"),
     )
     parser.add_argument(
@@ -195,25 +195,25 @@ def run(args):
     for name, frame in raw_frames.items():
         frame.to_csv(manifests / f"accessible_locked_{name}_records.csv", index=False)
 
-    dorian_records = canonicalize_accessible_frame(pd.read_csv(args.dorian_records))
+    bridge_records = canonicalize_accessible_frame(pd.read_csv(args.bridge_records))
     hyfa_records = canonicalize_accessible_frame(pd.read_csv(args.hyfa_records))
-    assert_shared_records(locked_test, dorian_records)
+    assert_shared_records(locked_test, bridge_records)
     assert_shared_records(locked_test, hyfa_records)
 
-    dorian = load_prediction_bundle(args.dorian_bundle)
+    bridge = load_prediction_bundle(args.bridge_bundle)
     hyfa = load_prediction_bundle(args.hyfa_bundle)
     expected_ids = locked_test["record_id"].astype(str).tolist()
-    if dorian["record_ids"].astype(str).tolist() != expected_ids:
-        raise ValueError("DORIAN record IDs differ from locked manifest")
+    if bridge["record_ids"].astype(str).tolist() != expected_ids:
+        raise ValueError("BRIDGE record IDs differ from locked manifest")
     if hyfa["record_ids"].astype(str).tolist() != expected_ids:
         raise ValueError("HYFA record IDs differ from locked manifest")
-    if dorian["gene_ids"].astype(str).tolist() != hyfa["gene_ids"].astype(str).tolist():
-        raise ValueError("DORIAN and HYFA gene order differs")
-    if not np.array_equal(dorian["y_true"], hyfa["y_true"]):
-        raise ValueError("DORIAN and HYFA truth matrices differ")
+    if bridge["gene_ids"].astype(str).tolist() != hyfa["gene_ids"].astype(str).tolist():
+        raise ValueError("BRIDGE and HYFA gene order differs")
+    if not np.array_equal(bridge["y_true"], hyfa["y_true"]):
+        raise ValueError("BRIDGE and HYFA truth matrices differ")
 
     truth, teebot, support = fit_teebot_variants(data, raw_frames, args.components, args.seed)
-    if not np.array_equal(truth, dorian["y_true"]):
+    if not np.array_equal(truth, bridge["y_true"]):
         raise ValueError("TEEBoT truth differs from existing formal truth")
 
     split = split_donors(data.meta, seed=args.seed)
@@ -221,7 +221,7 @@ def run(args):
     tissue_means = tissue_mean_matrix(data.expr, tissue_ids, split.train_idx)
     target_ids = raw_frames["test"]["target_tissue"].to_numpy(dtype=np.int64)
     predictions = {
-        "DORIAN_accessible": np.asarray(dorian["predictions"]["CML_accessible_hide_one_gate"], dtype=np.float32),
+        "BRIDGE_accessible": np.asarray(bridge["predictions"]["CML_accessible_hide_one_gate"], dtype=np.float32),
         **teebot,
         "HYFA_accessible": np.asarray(hyfa["predictions"]["HYFA_accessible"], dtype=np.float32),
         "target_tissue_mean": np.asarray(tissue_means[target_ids], dtype=np.float32),
@@ -230,7 +230,7 @@ def run(args):
         if values.shape != truth.shape or not np.isfinite(values).all():
             raise ValueError(f"invalid prediction coverage for {method}")
 
-    gene_ids = dorian["gene_ids"].astype(str)
+    gene_ids = bridge["gene_ids"].astype(str)
     save_prediction_bundle(
         raw / "accessible_teebot_benchmark_predictions.npz",
         np.asarray(expected_ids, dtype=object),
@@ -261,11 +261,11 @@ def run(args):
         "target_tissues": int(raw_frames["test"]["target_tissue"].nunique()),
         "test_record_hash": locked_hash,
         "gene_order_hash": array_hash(gene_ids.astype("U")),
-        "dorian_bundle_sha256": sha256(args.dorian_bundle),
+        "bridge_bundle_sha256": sha256(args.bridge_bundle),
         "hyfa_bundle_sha256": sha256(args.hyfa_bundle),
         "teebot_components": int(args.components),
         "teebot_primary_demographics": ["age_divided_by_100", "encoded_sex"],
-        "dorian_retrained": False,
+        "bridge_retrained": False,
         "donor_disjoint_split": True,
         "shared_record_order": True,
         "shared_truth": True,

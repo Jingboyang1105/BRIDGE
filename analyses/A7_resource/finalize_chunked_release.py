@@ -56,7 +56,7 @@ def main():
     measured = np.load(str(compat / "expr.npy"), mmap_mode="r")
     same = np.load(str(completed / "imputed_same_donor_expert.npy"), mmap_mode="r")
     memory = np.load(str(completed / "imputed_memory_expert.npy"), mmap_mode="r")
-    dorian = np.load(str(completed / "imputed_dorian.npy"), mmap_mode="r")
+    bridge = np.load(str(completed / "imputed_dorian.npy"), mmap_mode="r")
     meta = pd.read_csv(str(compat / "meta.csv"), index_col=0)
     profiles = pd.read_csv(str(metadata / "imputed_profile_manifest.csv"))
     queries = profiles[["donor", "target_tissue"]].to_dict("records")
@@ -71,16 +71,16 @@ def main():
     string_dtype = h5py.string_dtype(encoding="utf-8")
     with h5py.File(str(temporary), "w") as handle:
         handle.attrs["dataset"] = "GTEx v11"
-        handle.attrs["method"] = "DORIAN"
+        handle.attrs["method"] = "BRIDGE"
         handle.attrs["seed"] = 42
         handle.attrs["value_source_codes"] = "0=not-imputed,1=measured,2=imputed"
         measured_ds = handle.create_dataset(
             "measured/expression", shape=measured.shape, dtype="f4",
             chunks=(args.chunk_rows, measured.shape[1]), compression="lzf",
         )
-        dorian_ds = handle.create_dataset(
-            "imputed/dorian", shape=dorian.shape, dtype="f4",
-            chunks=(args.chunk_rows, dorian.shape[1]), compression="lzf",
+        bridge_ds = handle.create_dataset(
+            "imputed/dorian", shape=bridge.shape, dtype="f4",
+            chunks=(args.chunk_rows, bridge.shape[1]), compression="lzf",
         )
         same_ds = handle.create_dataset(
             "imputed/same_donor_expert", shape=same.shape, dtype="f4",
@@ -91,14 +91,14 @@ def main():
             chunks=(args.chunk_rows, memory.shape[1]), compression="lzf",
         )
         copy_matrix(measured, measured_ds, args.chunk_rows)
-        copy_matrix(dorian, dorian_ds, args.chunk_rows)
+        copy_matrix(bridge, bridge_ds, args.chunk_rows)
         copy_matrix(same, same_ds, args.chunk_rows)
         copy_matrix(memory, memory_ds, args.chunk_rows)
         handle.create_dataset("measured/sample_id", data=meta.index.astype(str).to_numpy(), dtype=string_dtype)
         handle.create_dataset("measured/tissue", data=meta["tissue_idx"].astype(np.int16).to_numpy())
         handle.create_dataset("imputed/donor", data=profiles["donor"].astype(str).to_numpy(), dtype=string_dtype)
         handle.create_dataset("imputed/target_tissue", data=profiles["target_tissue"].astype(np.int16).to_numpy())
-        handle.create_dataset("imputed/same_donor_weight", data=profiles["same_donor_weight"].astype(np.float32).to_numpy())
+        handle.create_dataset("imputed/same_donor_weight", data=profiles["donor_level_average_weight"].astype(np.float32).to_numpy())
         handle.create_dataset("imputed/memory_weight", data=profiles["memory_weight"].astype(np.float32).to_numpy())
         handle.create_dataset("manifest/donor", data=np.asarray(donors, dtype=object), dtype=string_dtype)
         handle.create_dataset("manifest/gene_id", data=gene_ids, dtype=string_dtype)

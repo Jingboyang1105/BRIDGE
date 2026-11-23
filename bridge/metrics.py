@@ -1,4 +1,4 @@
-﻿"""Evaluation indicators for DORIAN gene-imputation experiments.
+"""Evaluation indicators for BRIDGE gene-imputation experiments.
 
 The publication metrics are mean sample-wise, mean gene-wise, and residual
 sample-wise Pearson correlations.  A flattened matrix correlation is retained

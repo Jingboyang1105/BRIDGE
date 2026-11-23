@@ -23,9 +23,9 @@ OLD_RECORDS = ROOT / "02_Benchmark_vs_HYFA_PMM" / "figures" / "brain_tissues" / 
 NEW_RECORDS = ROOT / "09_Accessible_TEEBoT_Benchmark" / "results" / "tables" / "Table_accessible_record_metrics.csv"
 OUT = ROOT / "09_Accessible_TEEBoT_Benchmark" / "results" / "figures"
 
-METHODS = ["DORIAN", "HYFA", "PMM", "TEEBoT"]
+METHODS = ["BRIDGE", "HYFA", "PMM", "TEEBoT"]
 COLORS = {
-    "DORIAN": "#6C5CE7",
+    "BRIDGE": "#6C5CE7",
     "HYFA": "#F2B84B",
     "PMM": "#36B8A5",
     "TEEBoT": "#4C78A8",
@@ -48,7 +48,7 @@ def build_source() -> pd.DataFrame:
     teebot["method"] = "TEEBoT"
 
     meta = (
-        old.loc[old["method"].eq("DORIAN"), [
+        old.loc[old["method"].eq("BRIDGE"), [
             "record_id", "target_tissue", "target_tissue_name", "display_tissue", "tissue_order"
         ]]
         .drop_duplicates("record_id")
@@ -82,7 +82,7 @@ def build_source() -> pd.DataFrame:
 
 def draw_violin(ax: plt.Axes, source: pd.DataFrame, metric: str, ylabel: str) -> None:
     tissue_rows = (
-        source.loc[source["method"].eq("DORIAN")]
+        source.loc[source["method"].eq("BRIDGE")]
         .sort_values("tissue_order")
         .drop_duplicates("target_tissue")
     )
@@ -150,7 +150,7 @@ def draw_horizontal_violin(
     show_tissue_labels: bool,
 ) -> None:
     meta = (
-        source.loc[source["method"].eq("DORIAN"), ["target_tissue", "display_tissue"]]
+        source.loc[source["method"].eq("BRIDGE"), ["target_tissue", "display_tissue"]]
         .drop_duplicates("target_tissue")
         .set_index("target_tissue")
     )
@@ -206,7 +206,7 @@ def draw_horizontal_violin(
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     source = build_source()
-    source.to_csv(OUT / "SourceData_accessible_DORIAN_HYFA_PMM_TEEBoT_violins.csv", index=False)
+    source.to_csv(OUT / "SourceData_accessible_BRIDGE_HYFA_PMM_TEEBoT_violins.csv", index=False)
 
     fig, axes = plt.subplots(2, 1, figsize=(18.0, 10.0))
     draw_violin(axes[0], source, "residual_sample_pearson", "Residual Pearson correlation")
@@ -219,20 +219,20 @@ def main() -> None:
         frameon=False, fontsize=9, handlelength=1.5, columnspacing=1.8,
     )
     fig.subplots_adjust(left=0.065, right=0.995, top=0.94, bottom=0.20, hspace=0.54)
-    save_all(fig, OUT / "accessible_DORIAN_HYFA_PMM_TEEBoT_violin_panels")
+    save_all(fig, OUT / "accessible_BRIDGE_HYFA_PMM_TEEBoT_violin_panels")
     plt.close(fig)
 
     # Requested paper layout: tissues run vertically, two metrics are side by side.
-    dorian_rank = (
-        source.loc[source["method"].eq("DORIAN")]
+    bridge_rank = (
+        source.loc[source["method"].eq("BRIDGE")]
         .groupby("target_tissue", as_index=False)["residual_sample_pearson"]
         .mean()
         .sort_values("residual_sample_pearson", ascending=False)
     )
-    ranked_tissues = dorian_rank["target_tissue"].astype(int).tolist()
+    ranked_tissues = bridge_rank["target_tissue"].astype(int).tolist()
     rank_map = {tissue: rank + 1 for rank, tissue in enumerate(ranked_tissues)}
-    source["dorian_residual_rank"] = source["target_tissue"].map(rank_map)
-    source.to_csv(OUT / "SourceData_accessible_DORIAN_HYFA_PMM_TEEBoT_violins.csv", index=False)
+    source["bridge_residual_rank"] = source["target_tissue"].map(rank_map)
+    source.to_csv(OUT / "SourceData_accessible_BRIDGE_HYFA_PMM_TEEBoT_violins.csv", index=False)
 
     # Standalone paper panels: tissues on the left, one metric per file.
     for metric, xlabel in [
@@ -251,7 +251,7 @@ def main() -> None:
         standalone.subplots_adjust(left=0.37, right=0.985, top=0.955, bottom=0.065)
         save_all(
             standalone,
-            OUT / f"accessible_DORIAN_HYFA_PMM_TEEBoT_horizontal_violin_{metric}",
+            OUT / f"accessible_BRIDGE_HYFA_PMM_TEEBoT_horizontal_violin_{metric}",
         )
         plt.close(standalone)
 
@@ -271,7 +271,7 @@ def main() -> None:
         frameon=False, fontsize=8.5, handlelength=1.4, columnspacing=1.6,
     )
     fig.subplots_adjust(left=0.29, right=0.99, top=0.955, bottom=0.065)
-    save_all(fig, OUT / "accessible_DORIAN_HYFA_PMM_TEEBoT_violin_horizontal")
+    save_all(fig, OUT / "accessible_BRIDGE_HYFA_PMM_TEEBoT_violin_horizontal")
     plt.close(fig)
 
 

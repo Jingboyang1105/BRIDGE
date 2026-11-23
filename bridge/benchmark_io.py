@@ -1,11 +1,11 @@
-﻿"""Shared prediction-matrix adapter for our model, HYFA, and TEEBoT."""
+"""Shared prediction-matrix adapter for our model, HYFA, and TEEBoT."""
 
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from dorian.metrics import overall_metrics, per_tissue_metrics
+from bridge.metrics import overall_metrics, per_tissue_metrics
 
 
 def _pred_key(method):

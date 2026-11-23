@@ -47,7 +47,7 @@ def main() -> None:
         linewidth=1.4,
     )
     ax.set_xlabel("Number of observed tissues")
-    ax.set_ylabel("Mean memory-retrieval expert weight")
+    ax.set_ylabel("Mean sample-matching expert weight")
     ax.set_ylim(0.40, 0.54)
     ax.set_yticks(np.arange(0.40, 0.541, 0.02))
     ax.grid(axis="both", color="#E8E8E8", linewidth=0.6)

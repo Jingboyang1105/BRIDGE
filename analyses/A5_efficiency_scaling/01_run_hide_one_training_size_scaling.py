@@ -1,4 +1,4 @@
-"""Run formal GTEx hide-one training-size scaling for DORIAN."""
+"""Run formal GTEx hide-one training-size scaling for BRIDGE."""
 
 import argparse
 import json
@@ -110,7 +110,7 @@ def _row_with_residual(method, true, pred, arrays, tissue_means, extra):
 
 
 def _expert_stack(arrays, cml_pred):
-    return np.stack([arrays["same_donor"], cml_pred], axis=1).astype(np.float32)
+    return np.stack([arrays["donor_level_average"], cml_pred], axis=1).astype(np.float32)
 
 
 def predict_training_retrieval(model, train_z, train_expr, train_ds, train_records, batch, k, device):
@@ -258,7 +258,7 @@ def run_fraction(data, split, fraction, args, out_dir):
         "mixer_batch": int(args.gate_batch),
     }
     rows = [
-        _row_with_residual("same_donor_residual", test_arrays["true"], test_arrays["same_donor"], test_arrays, tissue_means, extra),
+        _row_with_residual("donor_level_average_residual", test_arrays["true"], test_arrays["donor_level_average"], test_arrays, tissue_means, extra),
         _row_with_residual("cml_retrieval", test_true, test_cml, test_arrays, tissue_means, extra),
         _row_with_residual("two_expert_cml_gate", test_arrays["true"], test_gate, test_arrays, tissue_means, extra),
     ]
@@ -268,7 +268,7 @@ def run_fraction(data, split, fraction, args, out_dir):
     pd.DataFrame(
         {
             "fraction": float(fraction),
-            "same_donor_weight": test_weights[:, 0],
+            "donor_level_average_weight": test_weights[:, 0],
             "retrieval_weight": test_weights[:, 1],
             "target_tissue": test_arrays["target_tissue"],
             "known_counts": test_arrays["known_counts"],

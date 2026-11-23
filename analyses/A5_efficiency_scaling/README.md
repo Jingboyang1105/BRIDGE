@@ -1,6 +1,6 @@
 # A5 — Training efficiency and data scaling
 
-**Question:** How quickly do DORIAN and HYFA reach validation-MAE thresholds, and how does hide-one performance change with training-set size?
+**Question:** How quickly do BRIDGE and HYFA reach validation-MAE thresholds, and how does hide-one performance change with training-set size?
 
 Only the corrected hide-one scaling run is included. The superseded run and all random-known m=5 scaling results are excluded.
 

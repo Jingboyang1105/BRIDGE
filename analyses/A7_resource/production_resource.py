@@ -1,4 +1,4 @@
-"""Full-data DORIAN production-resource helpers and command-line workflow."""
+"""Full-data BRIDGE production-resource helpers and command-line workflow."""
 
 from collections import defaultdict
 
@@ -91,13 +91,13 @@ def select_topk_excluding_donor(similarity, query_donors, memory_donors, k):
     return np.vstack(top_rows), np.vstack(score_rows)
 
 
-def combine_experts(same_donor, memory, weights):
-    same_donor = np.asarray(same_donor, dtype=np.float32)
+def combine_experts(donor_level_average, memory, weights):
+    donor_level_average = np.asarray(donor_level_average, dtype=np.float32)
     memory = np.asarray(memory, dtype=np.float32)
     weights = np.asarray(weights, dtype=np.float32)
-    if same_donor.shape != memory.shape or weights.shape != (same_donor.shape[0], 2):
+    if donor_level_average.shape != memory.shape or weights.shape != (donor_level_average.shape[0], 2):
         raise ValueError("Expert and weight dimensions do not agree")
-    return (same_donor * weights[:, :1] + memory * weights[:, 1:2]).astype(np.float32)
+    return (donor_level_average * weights[:, :1] + memory * weights[:, 1:2]).astype(np.float32)
 
 
 def build_status_matrix(meta, queries, n_tissues):

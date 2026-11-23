@@ -1,10 +1,6 @@
 # BRIDGE
 
-**BRIDGE (Body-wide Representation via Inter-tissue Decoding Gene Expression)** is a framework for donor-specific and tissue-specific gene-expression imputation.
-
-> **Naming note:** BRIDGE was previously developed under the name DORIAN.
-> To preserve backward compatibility and reproducibility, the internal Python
-> package, module names, and some code identifiers continue to use `dorian`.
+**BRIDGE (Body-wide Representation via Inter-tissue Decoding Gene Expression)** is a lightweight contrastive-learning framework for donor-specific and tissue-specific gene-expression imputation. It combines a donor-level average expert with a sample-matching expert through an adaptive mixer.
 
 This repository is the compact software and analysis-code release. It contains the core implementation, manuscript analysis scripts, a minimal API example, and focused correctness tests. Restricted GTEx inputs, trained checkpoints, large prediction artifacts, and generated analysis outputs are intentionally excluded.
 
@@ -14,7 +10,7 @@ Using Conda:
 
 ```bash
 conda env create -f environment.yml
-conda activate dorian
+conda activate bridge
 python -m pip install -e .
 ```
 
@@ -40,11 +36,11 @@ The example demonstrates the public two-expert combination interface with small 
 
 ```python
 import numpy as np
-from dorian import predict_missing_tissue
+from bridge import predict_missing_tissue
 
 prediction = predict_missing_tissue(
-    same_donor_prediction=np.array([1.2, 2.0, 3.1]),
-    memory_prediction=np.array([1.5, 1.5, 3.2]),
+    donor_level_average_prediction=np.array([1.2, 2.0, 3.1]),
+    sample_matching_prediction=np.array([1.5, 1.5, 3.2]),
     mixer_weights=np.array([0.6, 0.4]),
 )
 ```
@@ -54,7 +50,7 @@ prediction = predict_missing_tissue(
 After preparing the input cache described in [`data/README.md`](data/README.md), the manuscript hide-one model (20,000 genes, seed 42) corresponds to:
 
 ```bash
-python -m dorian.train_dorian --genes 20000 --seed 42 --m 5   --train_source hide_one_only --epochs 200 --batch 256 --mixer_epochs 50
+python -m bridge.train_bridge --genes 20000 --seed 42 --m 5   --train_source hide_one_only --epochs 200 --batch 256 --mixer_epochs 50
 ```
 
 The default command-line values are smaller settings for quick runs and do not reproduce the manuscript model.
@@ -68,7 +64,7 @@ python -m pytest -q
 ## Repository layout
 
 ```text
-dorian/       Core model, training, evaluation, and prediction code
+bridge/       Core model, training, evaluation, and prediction code
 analyses/     Manuscript analysis and figure-generation scripts
 examples/     Minimal public-API example
 tests/        Focused correctness tests
@@ -90,4 +86,3 @@ Citation metadata are provided in [`CITATION.cff`](CITATION.cff). The associated
 ## License
 
 An open-source license has not yet been approved by all authors. Until that decision is made, the terms in [`LICENSE`](LICENSE) apply.
-

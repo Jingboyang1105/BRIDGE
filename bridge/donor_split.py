@@ -1,4 +1,4 @@
-﻿"""Donor-level split utilities for the controlled DORIAN experiments."""
+"""Donor-level split utilities for the controlled BRIDGE experiments."""
 
 from dataclasses import dataclass
 

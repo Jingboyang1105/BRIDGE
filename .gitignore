@@ -14,14 +14,14 @@ venv/
 .idea/
 .vscode/
 
-# Credentials
+# Credentials and local configuration
 .env
 .env.*
 *.pem
 *.key
 credentials*
 
-# Large research artifacts
+# Restricted or large research artifacts
 *.h5
 *.hdf5
 *.gct
@@ -41,3 +41,4 @@ credentials*
 outputs/
 results/
 checkpoints/
+

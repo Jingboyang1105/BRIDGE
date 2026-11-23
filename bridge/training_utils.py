@@ -1,4 +1,4 @@
-﻿"""Train strict-protocol hide-one-tissue DORIAN two-expert model."""
+"""Train strict-protocol hide-one-tissue BRIDGE two-expert model."""
 
 import argparse
 from pathlib import Path
@@ -8,17 +8,17 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from dorian.data import load_gene_set
-from dorian.metrics import overall_metrics, per_tissue_metrics
-from dorian.memory_retrieval_expert import MemoryRetrievalEncoder, RecordDataset, contrastive_loss
-from dorian.adaptive_mixer import predict_with_adaptive_mixer, train_adaptive_mixer
-from dorian.records import (
+from bridge.data import load_gene_set
+from bridge.metrics import overall_metrics, per_tissue_metrics
+from bridge.sample_matching_expert import SampleMatchingEncoder, RecordDataset, contrastive_loss
+from bridge.adaptive_mixer import predict_with_adaptive_mixer, train_adaptive_mixer
+from bridge.records import (
     build_hide_one_records,
     build_known_count_records,
     build_random_known_count_records,
     donor_to_indices,
 )
-from dorian.donor_split import split_donors
+from bridge.donor_split import split_donors
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -95,7 +95,7 @@ def records_to_arrays(records, expr, meta, tissue_means):
     return {
         "true": np.vstack(true).astype(np.float32),
         "base": np.vstack(base).astype(np.float32),
-        "same_donor": np.vstack(same).astype(np.float32),
+        "donor_level_average": np.vstack(same).astype(np.float32),
         "target_tissue": np.array(target_tissue, dtype=np.int64),
         "known_counts": np.array(counts, dtype=np.float32),
     }
@@ -294,7 +294,7 @@ def run(args):
     print(f"records train={len(train_records)} val={len(val_records)} test={len(test_records)}")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = MemoryRetrievalEncoder(args.genes, int(tissue.max()) + 1, args.emb_dim).to(device)
+    model = SampleMatchingEncoder(args.genes, int(tissue.max()) + 1, args.emb_dim).to(device)
     val_memory_mae = train_memory_encoder(model, train_records, val_records, expr, meta, tissue_means, args, device)
     train_ds = RecordDataset(train_records, expr, meta, tissue_means)
     train_z, train_expr = encode_target_bank(model, train_ds, args.batch, device)
@@ -316,9 +316,9 @@ def run(args):
     test_arrays = records_to_arrays(test_records, expr, meta, tissue_means)
     _, test_memory = predict_retrieval(model, train_z, train_expr, RecordDataset(test_records, expr, meta, tissue_means), args.batch, args.k, device)
 
-    train_experts = np.stack([train_arrays["same_donor"], train_memory], axis=1)
-    val_experts = np.stack([val_arrays["same_donor"], val_memory], axis=1)
-    test_experts = np.stack([test_arrays["same_donor"], test_memory], axis=1)
+    train_experts = np.stack([train_arrays["donor_level_average"], train_memory], axis=1)
+    val_experts = np.stack([val_arrays["donor_level_average"], val_memory], axis=1)
+    test_experts = np.stack([test_arrays["donor_level_average"], test_memory], axis=1)
     gate, val_mixer_mae = train_adaptive_mixer(
         train_experts,
         train_arrays["true"],
@@ -334,7 +334,7 @@ def run(args):
         args.lr,
         device,
     )
-    test_dorian, test_weights = predict_with_adaptive_mixer(
+    test_bridge, test_weights = predict_with_adaptive_mixer(
         gate, test_experts, test_arrays["target_tissue"], test_arrays["known_counts"], args.gate_batch, device
     )
     tissue_names = {int(v): k for k, v in data.tissue_encoder.items()} if isinstance(data.tissue_encoder, dict) else {}
@@ -366,16 +366,16 @@ def run(args):
         tag,
         test_arrays,
         {
-            "dorian": test_dorian,
-            "same_donor_residual": test_arrays["same_donor"],
-            "memory_retrieval": test_memory,
+            "bridge": test_bridge,
+            "donor_level_average_residual": test_arrays["donor_level_average"],
+            "sample_matching": test_memory,
             "target_tissue_mean": test_arrays["base"],
         },
         tissue_names,
         extra,
     )
     write_record_qc(out_dir, tag, test_records, tissue_names)
-    pd.DataFrame(test_weights, columns=["same_donor_weight", "memory_weight"]).to_csv(
+    pd.DataFrame(test_weights, columns=["donor_level_average_weight", "memory_weight"]).to_csv(
         out_dir / f"{tag}_mixer_weights.csv", index=False
     )
     # Keep the historical checkpoint keys so previously trained models remain loadable.

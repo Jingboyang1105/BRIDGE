@@ -92,7 +92,7 @@ def panel(ax: plt.Axes, label: str) -> None:
 
 
 def training_efficiency() -> None:
-    dorian = pd.read_csv(FINAL / "dorian_validation_curve.csv")
+    bridge = pd.read_csv(FINAL / "dorian_validation_curve.csv")
     hyfa = pd.read_csv(FINAL / "hyfa_validation_curve.csv")
     summary = pd.read_csv(FINAL / "training_efficiency_summary.csv")
     cml_summary = summary[summary["model"].eq("CML_two_expert_gate")].set_index("metric")["value"]
@@ -106,15 +106,15 @@ def training_efficiency() -> None:
         }
     )
     mile["HYFA_div_CML"] = mile["HYFA_epoch"] / mile["CML_epoch"]
-    dorian["best"] = best_so_far(dorian["val_mae"])
+    bridge["best"] = best_so_far(bridge["val_mae"])
     hyfa["best"] = best_so_far(hyfa["val_mae"])
 
     fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.55), gridspec_kw={"width_ratios": [1.08, 0.92], "wspace": 0.55})
 
     ax = axes[0]
-    ax.plot(dorian["epoch"], dorian["best"], color=TEAL, lw=1.8, label="DORIAN")
+    ax.plot(bridge["epoch"], bridge["best"], color=TEAL, lw=1.8, label="BRIDGE")
     ax.plot(hyfa["epoch"], hyfa["best"], color=RUST, lw=1.8, label="HYFA")
-    ax.scatter([int(dorian.loc[dorian["val_mae"].idxmin(), "epoch"])], [dorian["val_mae"].min()], s=22, color=TEAL, zorder=3)
+    ax.scatter([int(bridge.loc[bridge["val_mae"].idxmin(), "epoch"])], [bridge["val_mae"].min()], s=22, color=TEAL, zorder=3)
     ax.scatter([int(hyfa.loc[hyfa["val_mae"].idxmin(), "epoch"])], [hyfa["val_mae"].min()], s=22, color=RUST, zorder=3)
     ax.set_xlim(0, 200)
     ax.set_ylim(0.252, 0.316)

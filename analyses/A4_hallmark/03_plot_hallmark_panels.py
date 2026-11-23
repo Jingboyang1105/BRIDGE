@@ -20,8 +20,8 @@ SRC = OUT / "source_data"
 FIG.mkdir(parents=True, exist_ok=True)
 SRC.mkdir(parents=True, exist_ok=True)
 
-COLORS = {"DORIAN": "#6C5CE7", "HYFA": "#F2B84B", "PMM": "#38B2A3"}
-METHOD_ORDER = ["DORIAN", "HYFA", "PMM"]
+COLORS = {"BRIDGE": "#6C5CE7", "HYFA": "#F2B84B", "PMM": "#38B2A3"}
+METHOD_ORDER = ["BRIDGE", "HYFA", "PMM"]
 HALLMARK_GROUP_COLORS = {
     "Immune / inflammation": "#4C78A8",
     "Metabolic / stress": "#72A36A",
@@ -77,8 +77,8 @@ def add_median_points(ax: plt.Axes, data: pd.DataFrame, tissue_order: list[str],
 
 def horizontal_violin(data: pd.DataFrame, metric: str, xlabel: str, stem: Path,
                       sort_ascending: bool, xlim: tuple[float, float] | None = None) -> None:
-    dorian = data.loc[data["method"] == "DORIAN"]
-    tissue_order = (dorian.groupby("target_tissue_name")[metric].mean()
+    bridge = data.loc[data["method"] == "BRIDGE"]
+    tissue_order = (bridge.groupby("target_tissue_name")[metric].mean()
                     .sort_values(ascending=sort_ascending).index.tolist())
     plot_data = data.copy()
     plot_data["target_tissue_name"] = pd.Categorical(
@@ -111,7 +111,7 @@ def horizontal_violin(data: pd.DataFrame, metric: str, xlabel: str, stem: Path,
 
 
 def build_hallmark() -> None:
-    clean_master = SRC / "hallmark_dorian_vs_hyfa_all50_source.csv"
+    clean_master = SRC / "hallmark_bridge_vs_hyfa_all50_source.csv"
     if clean_master.exists():
         master = pd.read_csv(clean_master)
     else:
@@ -127,11 +127,11 @@ def build_hallmark() -> None:
     table["recovery_rank"] = table["mean_residual_gene_pearson"].rank(
         method="first", ascending=False
     ).astype(int)
-    table["dorian_vs_hyfa_rank"] = table["mean_cml_vs_hyfa_mae_improvement"].rank(
+    table["bridge_vs_hyfa_rank"] = table["mean_cml_vs_hyfa_mae_improvement"].rank(
         method="first", ascending=False
     ).astype(int)
     table = table.sort_values("recovery_rank")[[
-        "recovery_rank", "dorian_vs_hyfa_rank", "hallmark", "label", "hallmark_group",
+        "recovery_rank", "bridge_vs_hyfa_rank", "hallmark", "label", "hallmark_group",
         "n_genes_in_20k", "mean_residual_gene_pearson", "mean_gene_pearson", "mean_mae",
         "mean_cml_vs_hyfa_mae_improvement", "delta_improvement_vs_background",
         "top_improved_overlap", "top_improved_odds_ratio", "top_improved_fisher_p",
@@ -139,7 +139,7 @@ def build_hallmark() -> None:
     ]]
     table_dir = ROOT / "Results_for_Paper" / "Supplementary_Tables"
     table_dir.mkdir(parents=True, exist_ok=True)
-    table.to_csv(table_dir / "Table_S_Hallmark_Recovery_and_DORIAN_vs_HYFA.csv", index=False)
+    table.to_csv(table_dir / "Table_S_Hallmark_Recovery_and_BRIDGE_vs_HYFA.csv", index=False)
 
     legend_handles = [
         Patch(facecolor=color, label=group)
@@ -147,7 +147,7 @@ def build_hallmark() -> None:
     ]
 
     # A: recovery across all 50 Hallmark sets. Categories and colors are shared
-    # exactly with the DORIAN-vs-HYFA enrichment panel below.
+    # exactly with the BRIDGE-vs-HYFA enrichment panel below.
     recovery = master.sort_values("mean_residual_gene_pearson", ascending=True).reset_index(drop=True)
     recovery["rank"] = np.arange(1, len(recovery) + 1)
     recovery_colors = recovery["hallmark_group"].map(HALLMARK_GROUP_COLORS).fillna("#9A9A9A")
@@ -173,7 +173,7 @@ def build_hallmark() -> None:
     save_all(fig, FIG / "hallmark_residual_recovery_all50_unified_colors")
     recovery.to_csv(SRC / "hallmark_residual_recovery_all50_unified_colors_source.csv", index=False)
 
-    # A: pathways with the largest average per-gene MAE reduction by DORIAN.
+    # A: pathways with the largest average per-gene MAE reduction by BRIDGE.
     top = master.nlargest(15, "mean_cml_vs_hyfa_mae_improvement").sort_values(
         "mean_cml_vs_hyfa_mae_improvement")
     fig, ax = plt.subplots(figsize=(6.8, 5.0))
@@ -188,7 +188,7 @@ def build_hallmark() -> None:
         color=group_colors, s=35, zorder=3,
     )
     ax.set_yticks(y, top["label"])
-    ax.set_xlabel("Mean MAE reduction: HYFA − DORIAN")
+    ax.set_xlabel("Mean MAE reduction: HYFA − BRIDGE")
     ax.set_ylabel("")
     ax.axvline(0, color="#777777", linewidth=0.7)
     ax.grid(axis="x", color="#E8E8E8", linewidth=0.5)
@@ -201,14 +201,14 @@ def build_hallmark() -> None:
     save_all(fig, FIG / "hallmark_top15_mean_mae_improvement")
     top.to_csv(SRC / "hallmark_top15_mean_mae_improvement_source.csv", index=False)
 
-    # B: pathways enriched among the genes most improved by DORIAN.
+    # B: pathways enriched among the genes most improved by BRIDGE.
     sig = master.loc[master["top_improved_fisher_fdr"] < 0.05].copy()
     sig = sig.sort_values("top_improved_odds_ratio")
     fig, ax = plt.subplots(figsize=(7.0, max(4.7, 0.26 * len(sig) + 1.2)))
     sig_colors = sig["hallmark_group"].map(HALLMARK_GROUP_COLORS).fillna("#9A9A9A")
     ax.barh(sig["label"], sig["top_improved_odds_ratio"], color=sig_colors, height=0.7)
     ax.axvline(1, color="#555555", linestyle="--", linewidth=0.75)
-    ax.set_xlabel("Odds ratio among genes most improved by DORIAN over HYFA")
+    ax.set_xlabel("Odds ratio among genes most improved by BRIDGE over HYFA")
     ax.set_ylabel("")
     ax.grid(axis="x", color="#E8E8E8", linewidth=0.5)
     ax.text(0.99, 1.01, "FDR < 0.05", transform=ax.transAxes, ha="right", va="bottom", color="#555555")
@@ -234,7 +234,7 @@ def build_hallmark() -> None:
                     xytext=(-4 if right_side else 4, 4), textcoords="offset points", fontsize=5.2,
                     ha="right" if right_side else "left")
     ax.axhline(1, color="#777777", linestyle="--", linewidth=0.65)
-    ax.set_xlabel("Mean MAE reduction: HYFA − DORIAN")
+    ax.set_xlabel("Mean MAE reduction: HYFA − BRIDGE")
     ax.set_ylabel("Odds ratio among most-improved genes")
     ax.grid(color="#ECECEC", linewidth=0.45)
     cbar = fig.colorbar(sc, ax=ax, pad=0.015)
@@ -248,7 +248,7 @@ def build_violins() -> None:
     hide = pd.read_csv(
         ROOT / "02_Benchmark_vs_HYFA_PMM" / "figures" / "all_tissues" /
         "hide_one_full_65_tissue_violin_source.csv")
-    hide["method"] = hide["method"].replace({"CML": "DORIAN"})
+    hide["method"] = hide["method"].replace({"CML": "BRIDGE"})
     hide = hide.loc[hide["method"].isin(METHOD_ORDER)].copy()
     horizontal_violin(hide, "residual_sample_pearson", "Residual Pearson correlation",
                       FIG / "hide_one_all65_residual_pearson_horizontal_violin",
@@ -274,7 +274,7 @@ def build_retrieval_analysis() -> None:
     support = pd.read_csv(ROOT / "07_GTEx_Completed_Resource" / "audit" / "tissue_support.csv")
     support = support[["target_tissue_name", "n_hide_one_training_records"]].rename(
         columns={"target_tissue_name": "retrieved_tissue_name", "n_hide_one_training_records": "support_proxy"})
-    for col in ["is_same_tissue", "is_same_donor", "is_known_tissue"]:
+    for col in ["is_same_tissue", "is_donor_level_average", "is_known_tissue"]:
         neighbors[col] = neighbors[col].astype(str).str.lower().eq("true")
     off = neighbors.loc[~neighbors["is_same_tissue"]].copy()
     off["same_system"] = off["target_tissue_system"] == off["retrieved_tissue_system"]

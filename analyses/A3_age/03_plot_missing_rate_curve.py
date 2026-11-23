@@ -14,16 +14,16 @@ RESULTS = ROOT / "results" / "all_eligible_formal_seed42"
 INPUT = RESULTS / "age_recovery_endpoints.csv"
 OUT = RESULTS / "figures"
 
-METHODS = ["DORIAN", "HYFA", "PMM", "Observed-only", "Mean-fill"]
+METHODS = ["BRIDGE", "HYFA", "PMM", "Observed-only", "Mean-fill"]
 COLORS = {
-    "DORIAN": "#6C5CE7",
+    "BRIDGE": "#6C5CE7",
     "HYFA": "#F2B84B",
     "PMM": "#E66B9A",
     "Observed-only": "#777777",
     "Mean-fill": "#35A7A0",
 }
 LINESTYLES = {
-    "DORIAN": "-",
+    "BRIDGE": "-",
     "HYFA": "-",
     "PMM": "-",
     "Observed-only": "--",
@@ -103,7 +103,7 @@ def main() -> None:
         y = part["mean_beta_pearson"].to_numpy()
         lo = part["ci95_low"].to_numpy()
         hi = part["ci95_high"].to_numpy()
-        primary = method in {"DORIAN", "HYFA", "PMM"}
+        primary = method in {"BRIDGE", "HYFA", "PMM"}
         ax.fill_between(x, lo, hi, color=COLORS[method], alpha=0.13 if primary else 0.08, linewidth=0)
         ax.plot(
             x,
@@ -111,7 +111,7 @@ def main() -> None:
             color=COLORS[method],
             linestyle=LINESTYLES[method],
             linewidth=2.25 if primary else 1.55,
-            marker="o" if method in {"DORIAN", "HYFA"} else ("D" if method == "PMM" else "s"),
+            marker="o" if method in {"BRIDGE", "HYFA"} else ("D" if method == "PMM" else "s"),
             markersize=5.2 if primary else 4.1,
             markeredgecolor="white",
             markeredgewidth=0.65,

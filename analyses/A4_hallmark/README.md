@@ -1,6 +1,6 @@
 # A4 — Hallmark recovery and enrichment
 
-**Question:** Which biological programs are recovered by DORIAN, and which contain disproportionate numbers of genes improved over HYFA?
+**Question:** Which biological programs are recovered by BRIDGE, and which contain disproportionate numbers of genes improved over HYFA?
 
 Final recovery, enrichment and supplementary tables are included. `03_plot_hallmark_panels.py` contains the selected plotting workflow extracted from the prior figure-options area.
 
