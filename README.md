@@ -1,6 +1,6 @@
 # BRIDGE
 
-**BRIDGE (Body-wide Representation via Inter-tissue Decoding Gene Expression)** is a lightweight contrastive-learning framework for donor-specific and tissue-specific gene-expression imputation. It combines a donor-level average expert with a sample-matching expert through an adaptive mixer.
+**BRIDGE (Body-wide Representation via Inter-tissue Decoding of Gene Expression)** is a lightweight contrastive-learning framework for donor-specific and tissue-specific gene-expression imputation. It combines a donor-level average expert with a sample-matching expert through an adaptive mixer.
 
 This repository is the compact software and analysis-code release. It contains the core implementation, manuscript analysis scripts, a minimal API example, and focused correctness tests. Restricted GTEx inputs, trained checkpoints, large prediction artifacts, and generated analysis outputs are intentionally excluded.
 
